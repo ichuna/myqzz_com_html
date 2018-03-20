@@ -1,0 +1,621 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>EffectiveModernC++ | 全真票据打印软件</title>
+  <meta name="keywords" content "undefined" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="目录
+
+1 Deducing Types
+2 auto
+3 Moving to Modern C++
+4 Smart Pointers
+5 Rvalue References, Move Semantics, and Perfect Forwarding
+6 Lambda Expressions
+7 The Concurrency API
+8 Tweaks
+
+
+1. Deducing Types1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EffectiveModernC++">
+<meta property="og:url" content="http://www.myqzz.com/2016/04/01/EffectiveModernC/index.html">
+<meta property="og:site_name" content="全真票据打印软件">
+<meta property="og:description" content="目录
+
+1 Deducing Types
+2 auto
+3 Moving to Modern C++
+4 Smart Pointers
+5 Rvalue References, Move Semantics, and Perfect Forwarding
+6 Lambda Expressions
+7 The Concurrency API
+8 Tweaks
+
+
+1. Deducing Types1">
+<meta property="og:updated_time" content="2016-04-01T08:13:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EffectiveModernC++">
+<meta name="twitter:description" content="目录
+
+1 Deducing Types
+2 auto
+3 Moving to Modern C++
+4 Smart Pointers
+5 Rvalue References, Move Semantics, and Perfect Forwarding
+6 Lambda Expressions
+7 The Concurrency API
+8 Tweaks
+
+
+1. Deducing Types1">
+  
+    <link rel="alternative" href="/atom.xml" title="全真票据打印软件" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  <!--link href="//fonts.useso.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css"-->
+  <!--<link href='http://fonts.useso.com/css?family=Open+Sans:300,400,600&subset=latin,latin-ext' rel='stylesheet'  -->
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="http://demo.myqzz.com/Setup.exe" alt title="立即下载《打印专家》" id="logo">全真票据打印软件</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">精确打印票证单书！</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/home">首页</a>
+        
+          <a class="main-nav-link" href="/archives">文档</a>
+        
+          <a class="main-nav-link" href="/demo">演示</a>
+        
+          <a class="main-nav-link" href="/download">下载</a>
+        
+          <a class="main-nav-link" href="/overview">界面</a>
+        
+          <a class="main-nav-link" href="/update">更新</a>
+        
+          <a class="main-nav-link" href="/print">样本</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="http://www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="www.myqzz.com">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-EffectiveModernC" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/01/EffectiveModernC/" class="article-date">
+  <time datetime="2016-04-01T22:02:44.000Z" itemprop="datePublished">2016-04-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      EffectiveModernC++
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>目录</p>
+<ul>
+<li>1 Deducing Types</li>
+<li>2 auto</li>
+<li>3 Moving to Modern C++</li>
+<li>4 Smart Pointers</li>
+<li>5 Rvalue References, Move Semantics, and Perfect Forwarding</li>
+<li>6 Lambda Expressions</li>
+<li>7 The Concurrency API</li>
+<li>8 Tweaks</li>
+</ul>
+<hr>
+<h2 id="1-Deducing-Types"><a href="#1-Deducing-Types" class="headerlink" title="1. Deducing Types"></a>1. Deducing Types</h2><pre><code>1. 理解模板类型参数推导
+    1. reference-ness忽略
+     2. universal reference：T&amp;&amp;
+     3. 数组类型：T (&amp;)[N]
+     4. 推导by-value参数时，const和volatile被忽略
+2. 理解auto类型推导
+    1. auto x3 = { 27 }; //x3类型是std::initializer_list&lt;int&gt;（对auto，要求元素须是相同类型），不是int
+    2. initializer常量不能用于void f(T param);的模板参数类型推导，但声明为void f(std::initializer_list&lt;T&gt;)可以
+    3. C++14允许函数返回值类型的推导，用的是template type deduction，不是auto type deduction
+
+3. 理解decltype
+    1. bool f(const Widget&amp; w); // decltype(w) is const Widget&amp;, decltype(f) is bool(const Widget&amp;)
+        1. 注意，函数类型的写法（ReturnType(ArgsType)）之前似乎没见过，好像是后来流行的？
+    2. 主要用途：声明依赖于函数参数的返回值类型
+        1. auto f(Container&amp; c, Index i) -&gt; decltype(c[i]) { ... }
+            1. 完善为 -&gt; decltype(std::forward&lt;Container&gt;(c)[i])
+        2. 但operator[]可能对std::vector&lt;bool&gt;特化模板容易出问题
+    3. C++14 decltype(auto)：可以正确处理引用类型的推导（因为decltype对左值类型总是返回T&amp;）
+            1. decltype(auto) f(Container&amp;&amp; c, Index i) { ...return std::forward&lt;Container&gt;(c)[i]; }
+    4. 对int x=0; decltype(x)得到int，decltype((x))返回int&amp;
+
+4. 怎样在IDE里查看编译器推导的类型
+</code></pre><hr>
+<h2 id="2-auto"><a href="#2-auto" class="headerlink" title="2. auto"></a>2. auto</h2><pre><code>1. 优先使用auto
+    1. std::function比auto慢？（总感觉这是编译器优化的问题）
+    2. v.size()是std::vector&lt;int&gt;::size_type类型（unsigned），使用auto可避免这个记忆负担？
+    3. for (const auto&amp; p : m) { ... } //为什么不是for(auto p : m)？
+2.所谓的可不见的内部代理类：auto highPriority = static_cast&lt;bool&gt;(features(w)[5]);
+</code></pre><hr>
+<h2 id="3-Moving-to-Modern-C"><a href="#3-Moving-to-Modern-C" class="headerlink" title="3. Moving to Modern C++"></a>3. Moving to Modern C++</h2><pre><code>1. 区别()与{}（初始化对象）
+    1. 如果类定义了std::initializer_list构造函数的话，{}优先匹配（不管实际的参数类型）//C++编译器的灵活性有点缺乏
+        1. 用空std::initializer_list初始化：Widget w4({}); //直接Widget w4{};调用默认构造
+    2. 变参模板（这让我想起了Scheme syntax-rules变态的模式匹配语法）
+        1. template&lt;typename T, typename... Ts&gt;
+        2. void doSomeWork(Ts&amp;&amp;... params){
+            1. T localObject(std::forward&lt;Ts&gt;(params)...);
+2. Prefer nullptr to 0 and NULL（这样的条款有点侨情）
+    1. f(nullptr); // calls f(void*) overload
+3. Prefer alias declarations to typedef&apos;s
+    1. 别名声明：using UPtrMapSS = std::unique_ptr&lt;std::unordered_map&lt;std::string, std::string&gt;&gt;;
+        using FP = void (*)(int, const std::string&amp;);
+        template&lt;typename T&gt; using MyAllocList = std::list&lt;T, MyAlloc&lt;T&gt;&gt;;
+            老实的写法：需要typename告诉编译器内部名字是一个类型不是变量，没有using好？
+    基于&lt;type_traits&gt;的类型特性擦除：
+        std::remove_const&lt;T&gt;::type
+        std::remove_reference&lt;T&gt;::type
+4. Prefer scoped enums to unscoped enums
+    enum class Color { black, white, red }; //但这样一来，引用枚举量时都需要那个枚举类名前缀
+    enum class Status: std::uint32_t;
+5. =delete
+6. overriding发生的前提：***
+    基类需要声明virtual
+    函数名必须相同（废话）
+    参数类型必须相同（*）
+    const性质必须相同（*）
+    返回类型和异常规格必须兼容（*）
+    C++11：引用限定必须相同：void f() &amp;; void f() &amp;&amp;;（代表f只能在左值/右值对象上调用）
+7. override是上下文关键字（C++11特性），可用作函数名称
+8. Prefer const_iterators to iterators
+    作者又在强调常量迭代器了，但实际上，STL的非常量迭代器通常更有效
+    定义非成员版本的cbegin：//优先非成员只不过是作者偏好FP风格的体现
+        template &lt;class C&gt; auto cbegin(const C&amp; container)-&gt;decltype(std::begin(container)) { ... }
+            注意，const类型修饰只是为了让编译器帮助我们完成一些编译器的类型安全检查
+9. noexcept
+    vs C++98 throw() //差别在发生异常时的stack unwinding处理上，略
+    有条件的noexcept：noexcept(noexcept(swap(*a, *b)))
+10. constexpr
+    代表const in const out，可用作编译期的常量
+    C++11里对函数的一些限制：略（这只不过是编译器的实现问题，C++有时候老是会把语言、库与编译器实现混淆在一起！）
+    *C++14：setter也可以是constexpr
+11. const成员函数应该是线程安全的
+    可以修改mutable数据成员
+    如果要一次修改多个atomic，使用mutex保护一致性：std::lock_guard&lt;std::mutex&gt; g(m);
+12. 理解特殊的成员函数生成
+    copy操作（构造&amp;赋值）、move操作
+    C++11里，如果用户定义了dtor（析构函数），则move操作不会自动生成 =&gt; 可使用=default绕过
+    Member function templates never suppress generation of special member functions（C++里的偏僻规则太多了）
+        有些规则只对库设计者才有意义，使用者（App开发者）只需遵循编码规范就可以了
+</code></pre><hr>
+<h2 id="4-Smart-Pointers"><a href="#4-Smart-Pointers" class="headerlink" title="4. Smart Pointers"></a>4. Smart Pointers</h2><pre><code>1. C++11: std::auto_ptr, std::unique_ptr, std::shared_ptr, and std::weak_ptr
+2. std::unique_ptr
+    1.定制deleter：
+        auto delA = [](A* a){ ... delete a;}
+        std::unique_ptr&lt;A, decltype(delA)&gt; makeA(...){ ... }
+    转换为std::shared_ptr
+3. std::shared_ptr
+    1. 通常，保存引用计数的&apos;控制块是动态分配的
+        但std::make_shared将控制块与对象内存绑定到一起，这给对象的真正释放内存带来了麻烦
+        对比：std::shared_ptr&lt;Widget&gt; spw1(pw, loggingDel); //创建一个新的控制块
+    2. 奇特递归模板：class Widget: public std::enable_shared_from_this&lt;Widget&gt; { ... }
+        shared_from_this()之前需要已有std::shared_ptr引用
+            ==&gt; private ctor，+定义static create方法
+4. std::weak_ptr
+    1. 弱引用指针通常与引用计数指针配合使用：std::weak_ptr&lt;Widget&gt; wpw(spw);
+        1. if (wpw.expired()) ...
+        2. auto spw2 = wpw.lock();
+    2. 实现细节：std::shared_ptr的控制块中存储了弱引用计数？
+5. std::make_unique和std::make_shared
+    1. 资源泄漏：processWidget(std::shared_ptr&lt;Widget&gt;(new Widget), computePriority());
+        1.==&gt; processWidget(std::make_shared&lt;Widget&gt;(), computePriority());
+6. 当使用Pimpl习俗时，需要定义特殊的成员函数（dtor及move操作）
+    定制deleter是std::unique_ptr类型的一部分，但不是std::shared_ptr类型的一部分
+</code></pre><hr>
+<h2 id="5-Rvalue-References-Move-Semantics-and-Perfect-Forwarding"><a href="#5-Rvalue-References-Move-Semantics-and-Perfect-Forwarding" class="headerlink" title="5. Rvalue References, Move Semantics, and Perfect Forwarding"></a>5. Rvalue References, Move Semantics, and Perfect Forwarding</h2><pre><code>1. 即使声明为void f(T&amp;&amp; a); 参数总是左值
+2. 理解std::move和std::forward
+    1. std::move和std::forward既不移动也不转发，只是类型转换（运行时什么也不做）
+    2. std::move无条件把参数转换为右值，而std::forward要求实参必须是右值（注意，形参总是左值）
+        1. move构造函数的参数是非const的，但copy构造函数的参数是const的，这一差别允许const右值实参调用copy构造
+    1. std::move总是可以换成std::forward
+3. 区别‘通用引用’和右值引用
+    1. 不是右值引用：
+        1. void f(T&amp;&amp; param);
+        2. auto&amp;&amp; var2 = var1; //前提：存在类型推导
+    2. 右值引用：
+        1. void f(Widget&amp;&amp; param);
+        2. Widget&amp;&amp; var1 = Widget();
+        3. void f(std::vector&lt;T&gt;&amp;&amp; param);
+        4. void f(const T&amp;&amp; param);
+        5. 即使写成T&amp;&amp;但不存在类型推导的情况（从类模板实例化得到的成员函数 vs 成员函数模板）
+    3. C++14：
+        1. [](auto&amp;&amp; func, auto&amp;&amp;... params){ std::forward&lt;decltype(func)&gt;(func)(std::forward&lt;decltype(params)&gt;(params)...); }
+4. 在右值引用上使用std::move，在通用引用上使用std::forward
+    1. return std::move(lhs); //不发生“copy到临时对象”，注意lhs是‘通用引用’（T&amp;&amp;类型参数）
+    2. 不要return std::move局部对象（这种情况下反而无法RVO）
+        1. 编译器能够做RVO，即使你不写成return Widget();？
+            1. 这里面有点扯淡，因为仅仅是“C++标准委员会”这么说的，作者似乎混淆了TMP（模板元编程）和普通的写法
+5. Avoid overloading on universal references
+    1. copy构造函数的参数总是const的，一个非const的参数将优先匹配universal reference构造函数模板
+6. tag dispatch？脑抽！
+7. std::enable_if
+    1. typename = typename std::enable_if&lt;condition&gt;::type //靠，真是疯狂
+    2. typename std::decay&lt;T&gt;::type：去除类型T的引用、const、volatile修饰
+        1. condition：!std::is_same&lt;Person, typename std::decay&lt;T&gt;::type&gt;::value
+        2. C++14语法：std::decay_t&lt;T&gt;（不必再写typename）
+8. std::is_base_of&lt;T1, T2&gt;::value
+9. 理解引用塌陷
+        1. 不允许用户声明引用的引用，但是编译器可以这么做？只要有一个是lvalue引用，结果就是左值引用
+        2. 4个上下文：模板实例化、auto类型推导、typedef和using类型别名、decltype
+10. 完美转发
+    1. template&lt;typename T&gt; void fwd(T&amp;&amp; param){ f(std::forward&lt;T&gt;(param)); }
+    2. template&lt;typename... Ts&gt; void fwd(T&amp;&amp;... param){ f(std::forward&lt;T&gt;(param)...); }
+    3. 失败的情况：（无法类型推导，或不正确的推导）
+        1. braced initializer：void f(const std::vector&lt;int&gt;&amp; v); ==&gt; fwd({ 1, 2, 3 });
+        2. 0 or NULL as null pointers
+        3. 重载的函数指针、模板函数 ==&gt; 手工地指定函数重载或实例化版本
+        4. struct中的bit域（无法以非const寻址）
+    4. p211 references are simply pointers that are automatically dereferenced
+</code></pre><hr>
+<h2 id="6-Lambda-Expressions"><a href="#6-Lambda-Expressions" class="headerlink" title="6. Lambda Expressions"></a>6. Lambda Expressions</h2><pre><code>1. 避免默认捕获
+    1. using FilterContainer = std::vector&lt;std::function&lt;bool(int)&gt;&gt;;
+    2. filters.emplace_back( [](int value) { return value % 5 == 0; } );
+    3. [&amp;] 与 [=]
+    4. 不能捕获成员变量，捕获的是this指针（隐式）
+        1. 全局变量和static局部变量是引用不是捕获，捕获真针对局部变量（？）
+2. Use C++14 init capture to move objects into closures
+    1. auto pw = std::make_unique&lt;Widget&gt;();
+    2. auto func = [pw = std::move(pw)] { ... }
+        1. =&gt; auto func = [pw = std::make_unique&lt;Widget&gt;()] { ... }
+    3. move capture的C++11仿真：
+        1. auto func = std::bind( [](const std::vector&lt;double&gt;&amp; data){...}, std::move(data) );
+        2. Chromium代码里有类似的写法：void InProcessCommandBuffer::Destroy() {
+            1. base::WaitableEvent completion(true, false);
+            2. bool result = false;
+            3. base::Callback&lt;bool(void)&gt; destroy_task = base::Bind( &amp;InProcessCommandBuffer::DestroyOnGpuThread, base::Unretained(this));
+            4. QueueTask(base::Bind(&amp;RunTaskWithResult&lt;bool&gt;, destroy_task, &amp;result, &amp;completion));
+        3. mutable lambda？（见鬼，之前怎么没见过这种语法）
+3. Use decltype on auto&amp;&amp; parameters to std::forward them
+    1. C++14 泛型lambda？：auto f = [](auto x){ return func(normalize(x)); };
+    2. 完美转发：
+        1. auto f = [](auto&amp;&amp; param){ return func(normalize(std::forward&lt;decltype(param)&gt;(param))); };
+        2. variadic的版本：略
+4. Prefer lambdas to std::bind
+    1. bind对象（实际上是一个函数对象，注意，lambda也是！）
+    2. lambda更可读（这倒是真的，bind有点像FP里的currying）
+    3. p233 C++14 using namespace std::literals; //特殊的类型常量后缀语法，如1h 30s
+    4. bind传参now()的话，传的是bind时的时间，而不是目标函数被调用时的时间（嗯，这让我想起了JavaScript里类似的问题）
+        1. 推迟求值：auto setSoundB = std::bind(setAlarm,
+            1. std::bind(std::plus&lt;&gt;(), steady_clock::now(), 1h), _1, 30s);
+    5. 注意这里的语法，bind嵌套了bind以惰性求值
+    6. std::bind总是复制参数，但可以用std::ref来传引用：
+        1. auto compressRateB = std::bind(compress, std::ref(w), _1);
+    7. std::bind可接受任意类型，假设PolyWidget::operator()是成员模板，则可：auto boundPW = std::bind(pw, _1);
+        1. C++11 lambda：无等价形式
+        2. C++14：auto boundPW = [pw](const auto&amp; param){ pw(param); }; //但这种多态lambda有实际用途吗
+</code></pre><hr>
+<h2 id="7-The-Concurrency-API"><a href="#7-The-Concurrency-API" class="headerlink" title="7. The Concurrency API"></a>7. The Concurrency API</h2><pre><code>1. Prefer task-based programming to thread-based
+    1. auto futureResult = std::async(doAsyncWork);
+    2. 线程：硬件（CPU）、软件（OS）、std::thread对象
+        1. 即使函数不抛异常：int doAsyncWork() noexcept;，std::thread t(doAsyncWork);也有可能因为资源不足抛错
+        2. oversubscription问题（增加了调度开销）
+    3. std::async有可能在当前线程里执行doAsyncWork（异步的形式，实质却是同步函数调用），避免了线程过载
+    4. GUI线程响应问题：显示指定std::launch::async启动策略
+        1. 话说这里的讨论似乎与Chromium impl-side painting的目标有相通之处。。。
+2. Specify std::launch::async if asynchronicity is essential
+    1. 启动策略：std::launch::async 或 std::launch::deferred（直到在future上get/wait，此时同步执行）
+    2. if (fut.wait_for(0s) == std::future_status::deferred){ //那么直接同步调用？
+    3. 作者怎么这么喜欢写wrapper函数？std::result_of&lt;F(Ts...)&gt; ...
+3. Make std::threads unjoinable on all paths
+    1. implicit join：线程对象的析构函数会等待线程的执行完成（C++的这个API设计其实是有问题的，应该像Java那样提供显式的start方法）
+    2. ~ThreadRAII()：if (t.joinable()) { t.join() or detach() }
+4. Be aware of varying thread handle destructor behavior
+    1. 线程执行结果：不能存在callee的std::promise，也不能是caller的std::future（可转换为shared_future）
+        1. ==&gt; shared state（实际上存放在堆里）
+    2. The normal behavior is that a future’s destructor destroys the future object. That’s it.
+    3. ？
+    4. std::packaged_task（略）
+    5. The final future referring to a shared state for a non-deferred task launched via std::async blocks until the task completes
+        1. 这话说得太拗口了，其实不就是在析构函数里阻塞等待嘛
+5. Consider void futures for one-shot event communication
+    1. std::condition_variable cv; //条件变量上wait有可能导致CPU繁忙吗？
+    2. std::mutex m; //条件变量需要互斥访问，用mutex来保护
+    3. 通知方：cv.notify_one();
+    4. 等待方：{std::unique_lock&lt;std::mutex&gt; lk(m); cv.wait(lk); ...}
+    5. 问题：
+        1. mutex是否必需？
+        2. wait之前notify将导致hang
+        3. spurious wakeups：wait不是由于notify（这种情况下需要把wait放到while循环里？）
+    6. 由于只通知一次，考虑使用一个开关状态变量：std::atomic&lt;bool&gt; flag(false);
+        1. while (!flag); //但是这样会导致忙等
+    7. 使用普通bool flag; 但是用mutex加锁：
+        1. {std::lock_guard&lt;std::mutex&gt; g(m); flag = true;} cv.notify_one();
+        2. {std::unique_lock&lt;std::mutex&gt; lk(m); cv.wait(lk, [] { return flag; }); ...} //避免了notify信号丢失的问题
+    8. caller-callee一次通信：使用future-promise
+        1. std::promise&lt;void&gt; p;
+        2. 通知方：p.set_value();
+        3. 等待方：p.get_future().wait(); //没有mutex？那就是说没有加锁，那么底层是怎么做到的？
+        4. 注意，promise和future之间是一个动态堆分配的shared_state
+    9. p269 如果发生了异常的情况？（C++这种命令式语言要在异常情况下仍然能够保证事务处理的一致性恐怕有点困难）
+    10. auto sf = p.get_future().share(); ...（下略）
+6. Use std::atomic for concurrency, volatile for special memory
+    1. volatile：不能保证读与写操作的原子性，并且‘数据竞争’可导致无法预测/未定义的行为（编译器可生成任意指令？）
+    2. std::atomic限制了指令重排：写操作完成之前，不允许后续指令提前执行（感觉这更像是Java里的volatile？）
+    3. volatile std::atomic&lt;int&gt; vai;
+</code></pre><hr>
+<h3 id="8-Tweaks"><a href="#8-Tweaks" class="headerlink" title="8. Tweaks"></a>8. Tweaks</h3><pre><code>1. Consider pass by value for copyable parameters that are cheap to move and always copied
+    1. 重载 const std::string&amp; 和 std::string&amp;&amp;
+    2. T&amp;&amp; 加 std::forward&lt;T&gt;
+    3. std::string传值 加 std::move
+    4. C++98：经典的slicing问题（指的是一个子类对象传值给一个基类形参）
+2. Item 42: Consider emplacement instead of insertion
+    1. 42，不错的数字~
+    2. 直接传递一个字符串常量给一个std::string&amp;参数？临时对象析构和std::move开销
+        1. vs.emplace_back(&quot;xyzzy&quot;); //使用完美转发，直接在vector&lt;string&gt;容器内部构造一个string对象
+    3. 嗯，把它称为‘就地插入’
+    4. heuristics：
+        1. The value being added is constructed into the container, not assigned
+        2. The argument type(s) being passed differ from the type held by the container
+        3. The container is unlikely to reject the new value as a duplicate
+    5. 对shared_ptr不适用vp.emplace_back( new Widget())？
+        1. 但是如果先构造td::shared_ptr&lt;Widget&gt; spw(new Widget, killWidget);的话，则push_back、emplace_back无差别
+    6. 与explicit构造函数的交互
+        1. 可以regexes.emplace_back(nullptr);，那是因为regex允许从nullptr explicit构造
+            1. std::regex r(nullptr); 可以通过编译，但是属‘未定义行为’
+            2. 注意，前者是直接初始化，而std::regex r=nullptr;写法是拷贝初始化 
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="http://www.myqzz.com/2016/04/01/EffectiveModernC/" data-id="cjeywp8jr000jj8jxt9dww2i6" class="article-share-link" data-share="baidu" data-title="EffectiveModernC++">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C++</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/14/9/43/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          柳州银行现金存款单
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/03/30/6/14/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">中国邮政快递包裹</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/打印模板/">打印模板</a><span class="category-list-count">86</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/信汇凭证/">信汇凭证</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/凭证/">凭证</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/单位/">单位</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/复合票据/">复合票据</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/如何/">如何</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/快递单/">快递单</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/收支单/">收支单</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/现金支票/">现金支票</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/现金缴款单/">现金缴款单</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/电汇凭证/">电汇凭证</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/背书/">背书</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/自定义/">自定义</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/转账支票/">转账支票</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/进账单/">进账单</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/银行汇票/">银行汇票</a><span class="tag-list-count">9</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/信汇凭证/" style="font-size: 10.91px;">信汇凭证</a> <a href="/tags/凭证/" style="font-size: 12.73px;">凭证</a> <a href="/tags/单位/" style="font-size: 10.91px;">单位</a> <a href="/tags/复合票据/" style="font-size: 13.64px;">复合票据</a> <a href="/tags/如何/" style="font-size: 10.91px;">如何</a> <a href="/tags/快递单/" style="font-size: 18.18px;">快递单</a> <a href="/tags/收支单/" style="font-size: 11.82px;">收支单</a> <a href="/tags/现金支票/" style="font-size: 19.09px;">现金支票</a> <a href="/tags/现金缴款单/" style="font-size: 15.45px;">现金缴款单</a> <a href="/tags/电汇凭证/" style="font-size: 14.55px;">电汇凭证</a> <a href="/tags/背书/" style="font-size: 10.91px;">背书</a> <a href="/tags/自定义/" style="font-size: 13.64px;">自定义</a> <a href="/tags/转账支票/" style="font-size: 16.36px;">转账支票</a> <a href="/tags/进账单/" style="font-size: 20px;">进账单</a> <a href="/tags/银行汇票/" style="font-size: 17.27px;">银行汇票</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">五月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">四月 2016</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">三月 2016</a><span class="archive-list-count">77</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/05/16/14/56/">石柱县食品经营流动摊贩登记卡</a>
+          </li>
+        
+          <li>
+            <a href="/2016/05/16/14/57/">重庆市食品生产经营活动备案证</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/20/6/23/">顺丰快递_感动的心</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/16/6/16/">全峰快递</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/16/9/44/">贵阳银行现金送款簿</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://www.ichuna.com" target="_blank">出纳软件</a>
+          </li>
+        
+          <li>
+            <a href="http://www.myqzz.com" target="_blank">支票打印</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 王慧 <a href="http://www.miibeian.gov.cn" target="_blank">鄂ICP备12010931号-1</a><br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/home" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">文档</a>
+  
+    <a href="/demo" class="mobile-nav-link">演示</a>
+  
+    <a href="/download" class="mobile-nav-link">下载</a>
+  
+    <a href="/overview" class="mobile-nav-link">界面</a>
+  
+    <a href="/update" class="mobile-nav-link">更新</a>
+  
+    <a href="/print" class="mobile-nav-link">样本</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+</div>
+</body>
+</html>
